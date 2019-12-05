@@ -93,7 +93,7 @@ defmodule Mix.Tasks.Ct do
     f = fn [p, v], c ->
       case System.get_env(v) do
         nil ->
-          Mix.shell().info([:yellow, "#{source}: env var #{v} not found", :reset])
+          warn("#{source}: env var #{v} not found")
           c
 
         r ->
@@ -104,5 +104,9 @@ defmodule Mix.Tasks.Ct do
     content = List.foldl(vars, content, f)
 
     File.write!(destination, content)
+  end
+
+  defp warn(message) do
+    Mix.shell().info([:yellow, message, :reset])
   end
 end
