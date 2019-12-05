@@ -88,7 +88,7 @@ defmodule Mix.Tasks.Ct do
     content = File.read!(source)
 
     # Get a list of the environment variables that need replacing.
-    vars = Regex.scan(~r/\${(.+)}/U, content)
+    vars = Regex.scan(~R/\${(.+)}/U, content)
 
     f = fn [p, v], c ->
       case System.get_env(v) do
