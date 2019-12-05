@@ -77,8 +77,6 @@ defmodule Mix.Tasks.Ct do
           ct_cmd
         end
 
-      # IO.inspect(ct_cmd)
-
       case Mix.shell().cmd(Enum.join(ct_cmd, " ")) do
         0 -> :ok
         _status -> Mix.raise("One or more tests failed.")
