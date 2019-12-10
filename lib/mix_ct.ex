@@ -50,13 +50,13 @@ defmodule Mix.Tasks.Ct do
 
     # Is this correct?
     build_path = Mix.Project.build_path()
+    log_dir = Path.join(build_path, "logs")
     lib_path = Path.join(build_path, "lib")
     ebin_paths = Path.wildcard(Path.join([lib_path, "*", "ebin"]))
 
     test_dir = "test"
 
     if File.exists?(test_dir) do
-      log_dir = "logs"
       File.mkdir_p!(log_dir)
 
       ct_cmd =
