@@ -40,24 +40,38 @@ defmodule Mix.Tasks.Ct do
 
     Mix.Task.run("loadpaths")
 
-    # ".../top/_build/test/lib/app"
+    # ".../_build/<env>/lib/<app>"
     app_path = Mix.Project.app_path()
+    # ".../_build/<env>/lib/<app>/ebin"
     ebin_path = Path.join([app_path, "ebin"])
 
     # Ensure that 'ebin' is in the code search path; if the app isn't mentioned
     # in a dependency, it doesn't get added by default.
     Code.append_path(ebin_path)
 
-    # Is this correct?
+    # ".../_build/<env>"
     build_path = Mix.Project.build_path()
-    log_dir = Path.join(build_path, "logs")
     lib_path = Path.join(build_path, "lib")
     ebin_paths = Path.wildcard(Path.join([lib_path, "*", "ebin"]))
+    log_dir = Path.join(build_path, "logs")
 
+    # relative to cwd
     test_dir = "test"
 
     if File.exists?(test_dir) do
       File.mkdir_p!(log_dir)
+
+      # Symlink each _data/ directory into the 'ebin' directory.
+      for data_dir <- Path.wildcard(Path.join(test_dir, "*_data")) do
+        link_dst = Path.join(ebin_path, Path.basename(data_dir))
+        link_src = Path.expand(data_dir)
+
+        case Mix.Utils.symlink_or_copy(link_src, link_dst) do
+          {:ok, _paths} -> :ok
+          :ok -> :ok
+          # otherwise, fail with a case clause error
+        end
+      end
 
       ct_cmd =
         ["ct_run", "-no_auto_compile", "-noinput", "-abort_if_missing_suites", "-pa"] ++
