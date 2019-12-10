@@ -60,7 +60,7 @@ defmodule Mix.Tasks.Ct do
       File.mkdir_p!(log_dir)
 
       ct_cmd =
-        ["ct_run", "-no_auto_compile", "-noinput", "-pa"] ++
+        ["ct_run", "-no_auto_compile", "-noinput", "-abort_if_missing_suites", "-pa"] ++
           ebin_paths ++ ["-dir", test_dir, "-logdir", log_dir]
 
       app_config_src = Path.join(test_dir, "app.config.src")
