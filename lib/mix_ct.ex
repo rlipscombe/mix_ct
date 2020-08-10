@@ -108,7 +108,7 @@ defmodule Mix.Tasks.Ct do
       case System.get_env(v) do
         nil ->
           warn("#{source}: env var #{v} not found")
-          c
+          String.replace(c, p, "")
 
         r ->
           String.replace(c, p, r)
