@@ -1,6 +1,8 @@
 defmodule Mix.Tasks.Ct do
   use Mix.Task
 
+  import Mix.Generator
+
   @shortdoc "Run Common Test suites"
 
   @moduledoc """
@@ -32,12 +34,14 @@ defmodule Mix.Tasks.Ct do
 
   @impl true
   def run(args) do
-    {opts, _, _} =
-      OptionParser.parse(args, strict: [surefire: :boolean, cover: :boolean])
+    {opts, _, _} = OptionParser.parse(args, strict: [surefire: :boolean, cover: :boolean])
 
     Mix.shell().print_app()
 
     Mix.Task.run("loadpaths")
+
+    project = Mix.Project.config()
+    appname = project[:app]
 
     # ".../_build/<env>/lib/<app>"
     app_path = Mix.Project.app_path()
@@ -66,9 +70,12 @@ defmodule Mix.Tasks.Ct do
         link_src = Path.expand(data_dir)
 
         case Mix.Utils.symlink_or_copy(link_src, link_dst) do
-          {:ok, _paths} -> :ok
-          :ok -> :ok
-          # otherwise, fail with a case clause error
+          {:ok, _paths} ->
+            :ok
+
+          :ok ->
+            :ok
+            # otherwise, fail with a case clause error
         end
       end
 
@@ -76,9 +83,27 @@ defmodule Mix.Tasks.Ct do
         ["ct_run", "-no_auto_compile", "-noinput", "-abort_if_missing_suites", "-pa"] ++
           ebin_paths ++ ["-dir", test_dir, "-logdir", log_dir]
 
-      ct_cmd = if opts[:surefire] do
-        ct_cmd ++ ["-ct_hooks", "cth_surefire"]
-      end
+      ct_cmd =
+        if opts[:surefire] do
+          ct_cmd ++ ["-ct_hooks", "cth_surefire"]
+        else
+          ct_cmd
+        end
+
+      ct_cmd =
+        if opts[:cover] do
+          cover_spec = Path.join([app_path, "ct.cover.spec"])
+
+          assigns = [
+            app: appname,
+            coverdata: Path.join([app_path, "ct.coverdata"])
+          ]
+
+          create_file(cover_spec, cover_spec_template(assigns), force: true, quiet: true)
+          ct_cmd ++ ["-cover", cover_spec]
+        else
+          ct_cmd
+        end
 
       app_config_src = Path.join(test_dir, "app.config.src")
       app_config = Path.join(test_dir, "app.config")
@@ -126,4 +151,9 @@ defmodule Mix.Tasks.Ct do
   defp warn(message) do
     Mix.shell().info([:yellow, message, :reset])
   end
+
+  embed_template(:cover_spec, """
+  {incl_app, '<%= @app %>', details}.
+  {export, "<%= @coverdata %>"}.
+  """)
 end
