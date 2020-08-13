@@ -76,6 +76,10 @@ defmodule Mix.Tasks.Ct do
         ["ct_run", "-no_auto_compile", "-noinput", "-abort_if_missing_suites", "-pa"] ++
           ebin_paths ++ ["-dir", test_dir, "-logdir", log_dir]
 
+      ct_cmd = if opts[:surefire] do
+        ct_cmd ++ ["-ct_hooks", "cth_surefire"]
+      end
+
       app_config_src = Path.join(test_dir, "app.config.src")
       app_config = Path.join(test_dir, "app.config")
 
