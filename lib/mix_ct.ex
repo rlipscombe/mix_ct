@@ -15,7 +15,6 @@ defmodule Mix.Tasks.Ct do
 
   ## Command line options
 
-    * `--verbose` - enables verbose output
     * `--surefire` - enables Surefire-compatible XML output
     * `--cover` - exports coverage data. See below.
 
@@ -33,8 +32,8 @@ defmodule Mix.Tasks.Ct do
 
   @impl true
   def run(args) do
-    {_opts, _, _} =
-      OptionParser.parse(args, strict: [verbose: :boolean, surefire: :boolean, cover: :boolean])
+    {opts, _, _} =
+      OptionParser.parse(args, strict: [surefire: :boolean, cover: :boolean])
 
     Mix.shell().print_app()
 
