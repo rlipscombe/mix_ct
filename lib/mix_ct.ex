@@ -80,6 +80,7 @@ defmodule Mix.Tasks.Ct do
         end
       end
 
+      # We run ct_run as a separate process, to avoid cross-pollution.
       ct_cmd =
         ["ct_run", "-no_auto_compile", "-noinput", "-abort_if_missing_suites", "-pa"] ++
           ebin_paths ++ ["-dir", test_dir, "-logdir", log_dir]
