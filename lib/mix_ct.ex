@@ -52,7 +52,8 @@ defmodule Mix.Tasks.Ct do
     # in a dependency, it doesn't get added by default.
     Code.append_path(ebin_path)
 
-    # ".../_build/<env>"
+    # Get the paths we need for -pa, later.
+    # ".../_build/<env>/lib/*/ebin"
     build_path = Mix.Project.build_path()
     lib_path = Path.join(build_path, "lib")
     ebin_paths = Path.wildcard(Path.join([lib_path, "*", "ebin"]))
