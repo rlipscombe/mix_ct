@@ -98,7 +98,9 @@ defmodule Mix.Tasks.Ct do
 
           assigns = [
             app: appname,
-            coverdata: Path.join([app_path, "ct.coverdata"])
+            coverdata: Path.join([app_path, "ct.coverdata"]),
+            # mode: :details is responsible for the HTML output.
+            mode: :details
           ]
 
           create_file(cover_spec, cover_spec_template(assigns), force: true, quiet: true)
@@ -155,7 +157,7 @@ defmodule Mix.Tasks.Ct do
   end
 
   embed_template(:cover_spec, """
-  {incl_app, '<%= @app %>', details}.
+  {incl_app, '<%= @app %>', <%= @mode %>}.
   {export, "<%= @coverdata %>"}.
   """)
 end
